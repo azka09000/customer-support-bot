@@ -1,6 +1,7 @@
 from src.pdf_loader import PDFLoader
 from src.text_chunker import TextChunker
-from src.embedder import Embedder
+from src.tfidf_embedder import TFIDFEmbedder
+from src.vector_store import VectorStore
 
 
 def main():
@@ -14,17 +15,28 @@ def main():
     chunker = TextChunker(chunk_size=500, overlap=100)
     chunks = chunker.chunk_text(text)
 
-    print("TOTAL CHUNKS:", len(chunks))
+    print("\nTOTAL CHUNKS:", len(chunks))
 
-    # Step 3: embeddings
-    embedder = Embedder()
-    embeddings = embedder.embed(chunks)
+    # Step 3: TF-IDF embeddings
+    embedder = TFIDFEmbedder()
+    chunk_vectors = embedder.fit_transform(chunks)
 
-    print("\nEMBEDDING SHAPE:")
-    print(len(embeddings), len(embeddings[0]))
+    # Step 4: store vectors
+    store = VectorStore()
+    store.add_chunks(chunks, chunk_vectors)
 
-    print("\nSAMPLE EMBEDDING (first chunk):")
-    print(embeddings[0][:10])  # first 10 values
+    # Step 5: query test
+    question = "What are the rules for examinations?"
+    query_vector = embedder.transform([question])
+
+    results = store.search(query_vector, k=3)
+
+    print("\nTOP RESULTS:\n")
+
+    for i, r in enumerate(results, 1):
+        print(f"\nResult {i}")
+        print("-" * 40)
+        print(r)
 
 
 if __name__ == "__main__":
