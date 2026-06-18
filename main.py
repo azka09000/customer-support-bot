@@ -1,5 +1,6 @@
 from src.pdf_loader import PDFLoader
 from src.text_chunker import TextChunker
+from src.embedder import Embedder
 
 
 def main():
@@ -13,14 +14,17 @@ def main():
     chunker = TextChunker(chunk_size=500, overlap=100)
     chunks = chunker.chunk_text(text)
 
-    # Step 3: results
-    print("\nTOTAL CHUNKS:", len(chunks))
+    print("TOTAL CHUNKS:", len(chunks))
 
-    print("\nSAMPLE CHUNK:\n")
-    print(chunks[0])
+    # Step 3: embeddings
+    embedder = Embedder()
+    embeddings = embedder.embed(chunks)
 
-    print("\nANOTHER CHUNK:\n")
-    print(chunks[1])
+    print("\nEMBEDDING SHAPE:")
+    print(len(embeddings), len(embeddings[0]))
+
+    print("\nSAMPLE EMBEDDING (first chunk):")
+    print(embeddings[0][:10])  # first 10 values
 
 
 if __name__ == "__main__":
