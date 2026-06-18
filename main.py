@@ -9,8 +9,9 @@ from src.llm import GeminiLLM
 
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
-RETRIEVAL_K = 10  # Initial retrieval (before reranking)
-USE_FAISS = True  # Use FAISS for faster retrieval (requires: pip install faiss-cpu)
+RETRIEVAL_K = 3  # Top-k results
+USE_FAISS = True  # Use FAISS for faster retrieval
+USE_RERANKING = False  # Enable for better quality but slower (~2-3s overhead)
 
 
 def main():
@@ -59,11 +60,12 @@ def main():
     results = store.search(query_vector, k=RETRIEVAL_K)
     print(f"✓ Retrieved {len(results)} candidate chunks")
 
-    # Step 7: Rerank candidates using cross-encoder
-    print("\nStep 7: Reranking with cross-encoder...")
-    reranker = CrossEncoderReranker()
-    results = reranker.rerank(question, results, top_k=3)
-    print(f"✓ Reranked to top-3 results")
+    # Step 7: Rerank candidates using cross-encoder (optional)
+    if USE_RERANKING:
+        print("\nStep 7: Reranking with cross-encoder...")
+        reranker = CrossEncoderReranker()
+        results = reranker.rerank(question, results, top_k=3)
+        print(f"✓ Reranked to top-3 results")
 
     print("\n" + "="*50)
     print("TOP CHUNKS:")
