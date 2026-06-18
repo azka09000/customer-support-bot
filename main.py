@@ -5,71 +5,59 @@ from src.vector_store import VectorStore
 from src.llm import GeminiLLM
 
 
-def build_system():
+def main():
     file_path = "data/pdfs/academic_regulations.pdf"
 
-    # Step 1: extract text
+    # Day 1: Load PDF
+    print("Day 1: Loading PDF...")
     loader = PDFLoader(file_path)
     text = loader.extract_text()
+    print(f"✓ PDF loaded successfully")
 
-    # Step 2: chunk text
+    # Day 2: Chunk text
+    print("\nDay 2: Chunking text...")
     chunker = TextChunker(chunk_size=500, overlap=100)
     chunks = chunker.chunk_text(text)
+    print(f"✓ Created {len(chunks)} chunks")
 
-    print("\nTOTAL CHUNKS:", len(chunks))
-
-    # Step 3: TF-IDF
+    # Day 3: TF-IDF embeddings (no external APIs)
+    print("\nDay 3: Computing TF-IDF embeddings...")
     embedder = TFIDFEmbedder()
-    chunk_vectors = embedder.fit_transform(chunks)
+    chunk_vectors = embedder.fit_transform(chunks).toarray()
+    print(f"✓ Generated TF-IDF vectors (shape: {chunk_vectors.shape})")
 
-    # Step 4: store
+    # Day 4: Store vectors and build retriever
+    print("\nDay 4: Building vector store...")
     store = VectorStore()
     store.add_chunks(chunks, chunk_vectors)
+    print(f"✓ Vector store initialized")
 
-    return embedder, store
+    # Day 6: End-to-end pipeline
+    print("\nDay 6: Running RAG pipeline...")
+    question = "What are the rules for examinations?"
+    query_vector = embedder.transform([question]).toarray()[0]
 
+    results = store.search(query_vector, k=3)
+    print(f"✓ Retrieved {len(results)} relevant chunks")
 
-def main():
-    embedder, store = build_system()
+    print("\n" + "="*50)
+    print("TOP CHUNKS:")
+    print("="*50)
+    for i, chunk in enumerate(results, 1):
+        print(f"\nChunk {i}:")
+        print("-" * 40)
+        print(chunk[:200] + "..." if len(chunk) > 200 else chunk)
+
+    # Day 5: LLM answer generation
+    print("\n" + "="*50)
+    print("Day 5: Generating answer with Gemini...")
+    print("="*50)
     llm = GeminiLLM()
+    answer = llm.generate_answer(question, results)
 
-    history = []
-
-    print("\n📄 PDF Chatbot Ready! Type 'exit' to quit.\n")
-
-    while True:
-        question = input("You: ")
-
-        if question.lower().strip() == "exit":
-            print("Goodbye 👋")
-            break
-
-        # retrieve
-        query_vector = embedder.transform([question])
-        results = store.search(query_vector, k=3)
-
-        print("\nTOP CHUNKS:\n")
-        for i, r in enumerate(results, 1):
-            print(f"\nChunk {i}")
-            print("-" * 40)
-            print(r)
-
-        # build history string (simple version)
-        history_text = ""
-        for hq, ha in history[-3:]:
-            history_text += f"Q: {hq}\nA: {ha}\n\n"
-
-        # generate answer
-        answer = llm.generate_answer(
-            question=question,
-            context_chunks=results,
-            history=history_text
-        )
-
-        print("\nAI:", answer)
-
-        # save memory
-        history.append((question, answer))
+    print("\nFINAL ANSWER:")
+    print("-" * 40)
+    print(answer)
 
 
 if __name__ == "__main__":

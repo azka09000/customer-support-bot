@@ -8,20 +8,16 @@ class VectorStore:
 
     def add_chunks(self, chunks, vectors):
         self.chunks = chunks
-        self.vectors = vectors  # ❗ keep sparse matrix as-is
+        self.vectors = np.array(vectors)
 
     def search(self, query_vector, k=3):
-        # TF-IDF query is (1, n_features)
-        query_vector = query_vector
+        query_vector = np.array(query_vector)
 
-        # cosine similarity using sparse matrix multiplication
-        scores = (self.vectors @ query_vector.T).toarray().ravel()
+        # normalize
+        doc_norms = np.linalg.norm(self.vectors, axis=1)
+        query_norm = np.linalg.norm(query_vector)
 
-        # normalize (cosine similarity)
-        doc_norms = np.linalg.norm(self.vectors.toarray(), axis=1)
-        query_norm = np.linalg.norm(query_vector.toarray())
-
-        scores = scores / (doc_norms * query_norm + 1e-10)
+        scores = np.dot(self.vectors, query_vector) / (doc_norms * query_norm + 1e-8)
 
         top_k_idx = np.argsort(scores)[::-1][:k]
 
