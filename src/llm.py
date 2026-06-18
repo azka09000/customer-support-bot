@@ -1,5 +1,5 @@
 import os
-import google.generativeai as genai
+from google import genai
 
 
 class GeminiLLM:
@@ -9,8 +9,8 @@ class GeminiLLM:
         if not api_key:
             raise ValueError("GEMINI_API_KEY is not set")
 
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel("gemini-2.5-flash")
+        self.client = genai.Client(api_key=api_key)
+        self.model = "gemini-2.5-flash"
 
     def generate_answer(self, question, context_chunks, history=""):
         context = "\n\n".join(context_chunks)
@@ -32,5 +32,8 @@ Question:
 Answer clearly and concisely.
 """
 
-        response = self.model.generate_content(prompt)
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=prompt
+        )
         return response.text

@@ -8,7 +8,7 @@ class SemanticEmbedder:
         Initialize with a SentenceTransformer model for semantic embeddings.
 
         Args:
-            model_name: HuggingFace model ID (default: all-MiniLM-L6-v2 - fast, efficient)
+            model_name: HuggingFace model ID (default: all-MiniLM-L6-v2)
                 Other options: all-mpnet-base-v2 (better quality),
                              paraphrase-MiniLM-L6-v2, etc.
         """
