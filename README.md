@@ -74,37 +74,47 @@ Other options:
 
 ### Vector Store
 
-For production with large datasets, switch to FAISS:
+FAISS is enabled by default for fast retrieval. Set `USE_FAISS = False` in `main.py` to use NumPy:
 
 ```python
-from src.faiss_vector_store import FAISSVectorStore
-
-store = FAISSVectorStore()
-store.add_chunks(chunks, chunk_vectors)
+USE_FAISS = True  # Fast FAISS indexing (pip install faiss-cpu)
+# USE_FAISS = False  # Simple NumPy (always works)
 ```
 
 ### Chunk Size & Overlap
 
-Adjust in `main.py`:
+Tune retrieval quality by adjusting parameters in `main.py`:
 ```python
-chunker = TextChunker(chunk_size=500, overlap=100)
+CHUNK_SIZE = 500      # Characters per chunk
+CHUNK_OVERLAP = 100   # Character overlap between chunks
+RETRIEVAL_K = 10      # Initial candidates before reranking
 ```
+
+### Reranking
+
+Results are automatically reranked using a cross-encoder model:
+- Initial retrieval: k=10 chunks by semantic similarity
+- Reranking: Cross-encoder scores and selects top-3
+- Generation: Gemini uses top-3 chunks for answer
+
+This improves answer quality by re-scoring candidates with a task-specific model.
 
 ## Project Structure
 
 ```
 .
-├── main.py                      # Entry point
+├── main.py                      # Entry point with RAG pipeline
 ├── requirements.txt             # Dependencies
 ├── data/pdfs/                   # PDF documents
 └── src/
     ├── pdf_loader.py           # PDF text extraction
     ├── text_chunker.py         # Text splitting with overlap
     ├── semantic_embedder.py    # SentenceTransformers wrapper
-    ├── vector_store.py         # Simple NumPy-based store
-    ├── faiss_vector_store.py   # Optional FAISS store
+    ├── vector_store.py         # NumPy-based cosine similarity
+    ├── faiss_vector_store.py   # FAISS-based fast indexing
+    ├── reranker.py             # Cross-encoder reranking
     ├── llm.py                  # Gemini LLM integration
-    └── tfidf_embedder.py       # Legacy (TF-IDF - not used)
+    └── tfidf_embedder.py       # Legacy TF-IDF (not used)
 ```
 
 ## Advantages Over TF-IDF

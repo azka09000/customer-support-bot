@@ -13,24 +13,31 @@ class GeminiLLM:
         self.model = "gemini-2.5-flash"
 
     def generate_answer(self, question, context_chunks, history=""):
-        context = "\n\n".join(context_chunks)
+        formatted_context = "\n\n".join(
+            f"[Chunk {i+1}]\n{chunk}"
+            for i, chunk in enumerate(context_chunks)
+        )
 
-        prompt = f"""
-You are a helpful assistant.
+        prompt = f"""You are an expert assistant answering questions about university regulations and academic policies.
 
-Use ONLY the context to answer.
+INSTRUCTIONS:
+1. Use ONLY the provided context to answer questions
+2. If the answer is not available in the context, say: "I cannot find this information in the provided documents."
+3. Structure your answer clearly in paragraphs
+4. Cite the relevant chunk when making claims (e.g., "According to Chunk 1...")
+5. Be concise but comprehensive
+6. If the question is ambiguous, ask for clarification
 
-Previous conversation:
-{history}
+CONTEXT DOCUMENTS:
+{formatted_context}
 
-Context:
-{context}
+PREVIOUS CONVERSATION:
+{history if history else "None"}
 
-Question:
+QUESTION FROM USER:
 {question}
 
-Answer clearly and concisely.
-"""
+ANSWER:"""
 
         response = self.client.models.generate_content(
             model=self.model,
