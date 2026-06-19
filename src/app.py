@@ -15,13 +15,18 @@ st.set_page_config(
 )
 
 
-# ---------------- SAFE UI STYLE (FIXED VISIBILITY + INPUT FIX) ----------------
+# ---------------- SAFE UI STYLE (FIXED VISIBILITY + SIMPLE DESIGN) ----------------
 st.markdown(
     """
     <style>
         .stApp {
             background-color: #f6f1e7;
             color: #2b2b2b;
+        }
+
+        /* Global text fix */
+        html, body, p, div, span {
+            color: #2b2b2b !important;
         }
 
         /* Header */
@@ -46,6 +51,7 @@ st.markdown(
             border-radius: 10px;
             margin-bottom: 10px;
             color: #2b2b2b;
+            line-height: 1.6;
         }
 
         .user {
@@ -57,24 +63,18 @@ st.markdown(
             border: 1px solid #e6dccb;
         }
 
-        /* Chat text fix */
-        .chat-box p {
-            color: #2b2b2b !important;
-            margin: 0;
-        }
-
-        /* INPUT FIX */
+        /* INPUT FIX (VISIBLE TEXT WHILE TYPING) */
         textarea {
             color: #ffffff !important;
             background-color: #3b2f2a !important;
         }
 
-        textarea:focus {
-            caret-color: #ffffff !important;
-        }
-
         textarea::placeholder {
             color: #d6c7b2 !important;
+        }
+
+        textarea:focus {
+            caret-color: #ffffff !important;
         }
 
         input {
@@ -88,15 +88,9 @@ st.markdown(
 
 
 # ---------------- HEADER ----------------
-st.markdown(
-    "<div class='main-header'>📘 AI University Policy Assistant</div>",
-    unsafe_allow_html=True
-)
+st.markdown("<div class='main-header'>📘 AI University Policy Assistant</div>", unsafe_allow_html=True)
 
-st.markdown(
-    "<div class='sub-header'>Ask questions about academic regulations, attendance, exams, and student policies</div>",
-    unsafe_allow_html=True
-)
+st.markdown("<div class='sub-header'>Ask questions about academic regulations, attendance, exams, and student policies</div>", unsafe_allow_html=True)
 
 
 # ---------------- PIPELINE ----------------
@@ -164,8 +158,13 @@ if user_query:
         history=history_text
     )
 
+    # -------- FORMAT OUTPUT (IMPORTANT FIX) --------
+    formatted_answer = answer.replace("*", "\n•")
+
     # store assistant response
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+    st.session_state.messages.append(
+        {"role": "assistant", "content": formatted_answer}
+    )
 
     # refresh UI
     st.rerun()
