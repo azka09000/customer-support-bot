@@ -57,7 +57,41 @@ The system will:
 4. Retrieve relevant chunks for the query
 5. Generate an answer with Gemini
 
-## Configuration
+## Multi-PDF Support
+
+The system now processes **4 PDFs simultaneously**:
+- `academic_regulations.pdf` - Academic policies and requirements
+- `attendance_policy.pdf` - Attendance rules and consequences  
+- `examination_policy.pdf` - Exam procedures and grading
+- `student_handbook.pdf` - Campus facilities and student services
+
+**Combined**: 444KB of documents → 1113 chunks → 1113 embeddings
+
+### Testing Retrieval Quality
+
+Run the test suite to evaluate retrieval accuracy:
+
+```bash
+python test_retrieval_quality.py
+```
+
+**Current Performance:**
+- Overall accuracy: **80%** (8/10 queries)
+- Academic Regulations: 100%
+- Attendance Policy: 100%
+- Examination Policy: 0% (overlapping content)
+- Student Handbook: 100%
+- General queries: 100%
+
+### Retrieved Results Show PDF Sources
+
+When using `main.py`, results show which PDF they came from:
+
+```
+[Result 1] Source: academic_regulations.pdf
+[Result 2] Source: student_handbook.pdf
+[Result 3] Source: examination_policy.pdf
+```
 
 ### Embedding Model
 
@@ -137,13 +171,13 @@ This improves answer quality by re-scoring candidates with a task-specific model
 
 ## Future Enhancements
 
-- [ ] Add FAISS for indexing large PDFs
-- [ ] Implement multi-document retrieval
-- [ ] Add chat history/conversation context
-- [ ] Deploy with FastAPI web service
-- [ ] Add reranking layer (cross-encoder)
-- [ ] Implement prompt caching for Gemini
-- [ ] Add streaming responses
+- [ ] Enable reranking by default (`USE_RERANKING=True`) to improve Examination Policy retrieval
+- [ ] Add query expansion for better retrieval of specific topics
+- [ ] Implement hierarchical chunking for better document structure preservation
+- [ ] Add metadata filtering by source PDF
+- [ ] Cache embeddings for faster subsequent runs
+- [ ] Deploy as REST API with FastAPI
+- [ ] Add conversational memory for multi-turn Q&A
 
 ## License
 
