@@ -1,30 +1,27 @@
-from src.text_chunker import TextChunker
-
-
 class MultiPDFChunker:
-    """Chunk multiple documents while tracking their source."""
+    """Chunk multiple documents while tracking source."""
 
     def __init__(self, chunk_size=500, overlap=100):
-        self.chunker = TextChunker(chunk_size=chunk_size, overlap=overlap)
         self.chunk_size = chunk_size
         self.overlap = overlap
 
+    def chunk_text(self, text):
+        """Simple sliding window chunker."""
+        chunks = []
+
+        for i in range(0, len(text), self.chunk_size - self.overlap):
+            chunk = text[i:i + self.chunk_size]
+            if chunk.strip():
+                chunks.append(chunk)
+
+        return chunks
+
     def chunk_documents(self, documents_dict):
-        """
-        Chunk multiple documents.
-
-        Args:
-            documents_dict: {filename: text}
-
-        Returns:
-            chunks: List of chunk strings
-            metadata: List of {source, index} for each chunk
-        """
         chunks = []
         metadata = []
 
         for source, text in documents_dict.items():
-            source_chunks = self.chunker.chunk_text(text)
+            source_chunks = self.chunk_text(text)
 
             for idx, chunk in enumerate(source_chunks):
                 chunks.append(chunk)
@@ -37,7 +34,6 @@ class MultiPDFChunker:
         return chunks, metadata
 
     def get_chunk_info(self, chunk_idx, metadata):
-        """Get source information for a chunk."""
         if chunk_idx < len(metadata):
             meta = metadata[chunk_idx]
             return f"{meta['source']} (chunk {meta['chunk_index']}/{meta['total_chunks']})"

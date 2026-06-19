@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from src.pdf_loader import PDFLoader
+from pdf_loader import PDFLoader
 
 
 class MultiPDFLoader:
@@ -8,10 +8,9 @@ class MultiPDFLoader:
 
     def __init__(self, pdf_dir="data/pdfs"):
         self.pdf_dir = pdf_dir
-        self.documents = {}  # {filename: text}
+        self.documents = {}
 
     def load_all(self):
-        """Load all PDFs from directory."""
         if not os.path.exists(self.pdf_dir):
             raise FileNotFoundError(f"PDF directory not found: {self.pdf_dir}")
 
@@ -32,9 +31,7 @@ class MultiPDFLoader:
         return self.documents
 
     def get_document(self, filename):
-        """Get text for a specific document."""
         return self.documents.get(filename)
 
     def get_all_text(self):
-        """Get all text combined."""
         return "\n\n---\n\n".join(self.documents.values())
