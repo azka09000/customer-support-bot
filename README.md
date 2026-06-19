@@ -1,4 +1,4 @@
-# 📞 AI Customer Support Assistant (RAG System)
+# 📘 AI University Policy Assistant (RAG System)
 
 A Retrieval-Augmented Generation (RAG) based AI assistant that allows users to ask questions from multiple PDF documents and get accurate, context-aware answers using semantic search and Google Gemini LLM.
 

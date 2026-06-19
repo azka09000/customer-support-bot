@@ -9,8 +9,8 @@ from llm import GeminiLLM
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
-    page_title="AI Customer Support Assistant",
-    page_icon="📞",
+    page_title="AI University Policy Assistant",
+    page_icon="📘",
     layout="wide"
 )
 
@@ -89,12 +89,12 @@ st.markdown(
 
 # ---------------- HEADER ----------------
 st.markdown(
-    "<div class='main-header'>📞 AI Customer Support Assistant</div>",
+    "<div class='main-header'>📘 AI University Policy Assistant</div>",
     unsafe_allow_html=True
 )
 
 st.markdown(
-    "<div class='sub-header'>Ask questions from your documents and get instant answers</div>",
+    "<div class='sub-header'>Ask questions about academic regulations, attendance, exams, and student policies</div>",
     unsafe_allow_html=True
 )
 
@@ -151,7 +151,7 @@ if user_query:
     # retrieve chunks
     results = store.search(query_vector, k=3)
 
-    # ---------------- FIXED HISTORY BLOCK ----------------
+    # build history
     history_text = "\n".join(
         f"{m['role']}: {m['content']}"
         for m in st.session_state.messages[-6:]
