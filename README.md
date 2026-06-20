@@ -98,3 +98,6 @@ This system solves that by:
 - Ask about exam rules  
 - Search academic regulations  
 - Query student handbook content
+## 🎥 Demo
+
+![Demo](assets/demo.gif)
